@@ -36,10 +36,12 @@ interface Props {
   result: ClaudeAnalysis["employees"][number];
   maxValues: Record<keyof FeatureValues, number>;
   nameMap: NameMap;
+  hrNote: string;
+  onHrNoteChange: (note: string) => void;
   onClose: () => void;
 }
 
-export function EmployeeCard({ name, features, result, maxValues, nameMap, onClose }: Props) {
+export function EmployeeCard({ name, features, result, maxValues, nameMap, hrNote, onHrNoteChange, onClose }: Props) {
   const rn = (text: string) => resolveNames(text, nameMap);
   const trend = result.trend_direction ? TREND_CONFIG[result.trend_direction] : null;
   const TrendIcon = trend?.icon;
@@ -131,6 +133,20 @@ export function EmployeeCard({ name, features, result, maxValues, nameMap, onClo
             <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Тренд времени решения</p>
             <TrendChart data={features.weekly_execution} />
           </div>
+        </div>
+
+        {/* HR notes */}
+        <div className="flex flex-col gap-1.5 border-t pt-4">
+          <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Заметки HR
+          </label>
+          <textarea
+            value={hrNote}
+            onChange={(e) => onHrNoteChange(e.target.value)}
+            placeholder="Добавьте заметки по сотруднику — они войдут в PDF-отчёт"
+            rows={3}
+            className="w-full resize-none rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
         </div>
       </CardContent>
     </Card>

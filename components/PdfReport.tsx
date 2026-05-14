@@ -78,7 +78,8 @@ const s = StyleSheet.create({
   pageHdr:  { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16 },
   pageTitle:{ fontSize: 17, ...B, color: C.primary },
   pageSub:  { fontSize: 8,  color: C.muted, marginTop: 3 },
-  pageDate: { fontSize: 8,  color: C.muted },
+  pageDate: { fontSize: 11, ...B, color: C.primary },
+  pageDateSub: { fontSize: 7.5, color: C.muted, marginTop: 1 },
   divider:  { borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 16 },
 
   sectionTitle: { fontSize: 11, ...B, color: C.primary, marginBottom: 8, marginTop: 4 },
@@ -134,6 +135,10 @@ const s = StyleSheet.create({
 
   forecastMini:    { backgroundColor: "#fffbeb", borderWidth: 1, borderColor: "#fde68a", borderRadius: 4, padding: 7, marginTop: 6 },
   forecastMiniTxt: { fontSize: 8, lineHeight: 1.55, color: "#78350f" },
+
+  hrNotesBox: { backgroundColor: "#f0fdf4", borderWidth: 1, borderColor: "#bbf7d0", borderRadius: 4, padding: 8, marginTop: 8 },
+  hrNotesLbl: { fontSize: 7, color: "#15803d", ...B, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 },
+  hrNotesTxt: { fontSize: 8.5, lineHeight: 1.6, color: "#166534" },
 
   sectionBreak: { fontSize: 14, ...B, color: C.primary, marginBottom: 12 },
 });
@@ -264,9 +269,10 @@ interface ReportProps {
   nameMap: NameMap;
   periodStart: string;
   periodEnd: string;
+  hrNotes: Map<string, string>;
 }
 
-function ReportDoc({ analysis, features, nameMap, periodStart, periodEnd }: ReportProps) {
+function ReportDoc({ analysis, features, nameMap, periodStart, periodEnd, hrNotes }: ReportProps) {
   const rn = (t: string) => resolveNames(t, nameMap);
   const { department, hiring_forecast, employees } = analysis;
   const today = new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
@@ -297,7 +303,10 @@ function ReportDoc({ analysis, features, nameMap, periodStart, periodEnd }: Repo
             <Text style={s.pageTitle}>HR-Agent — Аналитический отчёт</Text>
             <Text style={s.pageSub}>Период: {periodStart} — {periodEnd}</Text>
           </View>
-          <Text style={s.pageDate}>Сформирован: {today}</Text>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={s.pageDate}>{today}</Text>
+            <Text style={s.pageDateSub}>Дата формирования</Text>
+          </View>
         </View>
         <View style={s.divider} />
 
@@ -466,6 +475,14 @@ function ReportDoc({ analysis, features, nameMap, periodStart, periodEnd }: Repo
                   <Text style={s.forecastMiniTxt}>{rn(emp.forecast_narrative)}</Text>
                 </View>
               )}
+
+              {/* HR notes */}
+              {hrNotes.get(emp.employee_id) && (
+                <View style={s.hrNotesBox}>
+                  <Text style={s.hrNotesLbl}>Заметки HR</Text>
+                  <Text style={s.hrNotesTxt}>{hrNotes.get(emp.employee_id)}</Text>
+                </View>
+              )}
             </View>
           );
         })}
@@ -483,6 +500,7 @@ export async function downloadPdfReport(
   nameMap: NameMap,
   periodStart: string,
   periodEnd: string,
+  hrNotes: Map<string, string> = new Map(),
 ) {
   const blob = await pdf(
     <ReportDoc
@@ -491,6 +509,7 @@ export async function downloadPdfReport(
       nameMap={nameMap}
       periodStart={periodStart}
       periodEnd={periodEnd}
+      hrNotes={hrNotes}
     />
   ).toBlob();
   const url = URL.createObjectURL(blob);

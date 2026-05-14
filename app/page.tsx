@@ -30,6 +30,11 @@ export default function Home() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [hrNotes, setHrNotesMap] = useState<Map<string, string>>(new Map());
+
+  function setHrNotes(id: string, note: string) {
+    setHrNotesMap((prev) => new Map(prev).set(id, note));
+  }
 
   async function handleExportPdf() {
     if (phase.name !== "dashboard") return;
@@ -40,7 +45,7 @@ export default function Home() {
       ).sort();
       const start = dates[0] ?? "—";
       const end = dates[dates.length - 1] ?? "—";
-      await downloadPdfReport(phase.analysis, phase.features, phase.nameMap, start, end);
+      await downloadPdfReport(phase.analysis, phase.features, phase.nameMap, start, end, hrNotes);
     } finally {
       setPdfLoading(false);
     }
@@ -249,6 +254,8 @@ export default function Home() {
               features={phase.features}
               nameMap={phase.nameMap}
               insights={phase.insights}
+              hrNotes={hrNotes}
+              setHrNotes={setHrNotes}
               onReset={handleReset}
             />
           </div>
