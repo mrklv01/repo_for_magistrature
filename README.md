@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HR-Agent MVP
 
-## Getting Started
+Инструмент предиктивного анализа рисков выгорания и перегрузки персонала на основе данных ITSM-системы.
 
-First, run the development server:
+Построен в рамках магистерской диссертации — Esil University, Астана, 2026.
+
+## Быстрый старт (локально)
 
 ```bash
+# 1. Установить зависимости
+npm install
+
+# 2. Добавить API-ключ Anthropic
+cp .env.local.example .env.local
+# Вставить ключ из console.anthropic.com
+
+# 3. Запустить
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Открыть [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Использование
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Нажмите **«Загрузить демо-датасет»** — или загрузите свою выгрузку CSV/XLSX из ITSM.
+2. Проверьте сводку: количество тикетов, сотрудники, период.
+3. Нажмите **«Запустить анализ рисков»** — Claude проанализирует данные за 20–40 секунд.
+4. Изучите дашборд: общий диагноз отдела, таблица сотрудников, клик по строке — детальная карточка.
+5. Экспортируйте отчёт в PDF или HTML через кнопки в шапке.
 
-## Learn More
+## Требования к CSV/XLSX
 
-To learn more about Next.js, take a look at the following resources:
+Минимальный набор колонок (названия могут отличаться — система определит автоматически):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Поле | Примеры названий |
+|------|-----------------|
+| Дата создания | `created_at`, `Дата создания`, `opened` |
+| Принято в работу | `accepted_at`, `Принято`, `start_date` |
+| Исполнитель | `assigned_to`, `Исполнитель`, `executor` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Остальные поля (приоритет, категория, статус, описание) улучшают качество анализа, но не обязательны.
 
-## Deploy on Vercel
+## Деплой на Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm i -g vercel
+vercel --prod
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+В настройках проекта Vercel → Environment Variables добавить `ANTHROPIC_API_KEY`.
+
+## Стек
+
+Next.js 16 · TypeScript · Tailwind CSS · shadcn/ui · Recharts · Claude API (Haiku 4.5)

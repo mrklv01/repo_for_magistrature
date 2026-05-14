@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Light theme ─────────────────────────────────────────────────────────── */
+:root {
+  --background: 220 20% 97%;
+  --foreground: 224 71% 4%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 71% 4%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 220 14% 94%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 220 14% 94%;
+  --muted-foreground: 215 16% 46%;
+  --accent: 220 14% 94%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 220 13% 90%;
+  --input: 220 13% 90%;
+  --ring: 221 83% 53%;
+  --radius: 0.6rem;
 }
+
+/* ── Dark theme (deep navy, like screenshot) ─────────────────────────────── */
+.dark {
+  --background: 224 40% 9%;
+  --foreground: 213 31% 91%;
+  --card: 224 35% 13%;
+  --card-foreground: 213 31% 91%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 224 32% 18%;
+  --secondary-foreground: 213 31% 91%;
+  --muted: 224 32% 18%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 224 32% 18%;
+  --accent-foreground: 213 31% 91%;
+  --destructive: 0 63% 55%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 224 32% 20%;
+  --input: 224 32% 20%;
+  --ring: 217 91% 60%;
+}
+
+* { border-color: hsl(var(--border)); }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* ── Print styles (PDF export via browser print dialog) ──────────────────── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .dark { --background: 0 0% 100%; --foreground: 0 0% 0%; --card: 0 0% 98%; }
+  @page { margin: 1.5cm; size: A4; }
 }
