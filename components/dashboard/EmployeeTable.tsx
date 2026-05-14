@@ -28,9 +28,11 @@ interface Props {
   features: EmployeeFeatures[];
   nameMap: NameMap;
   maxValues: Record<keyof FeatureValues, number>;
+  hrNotes: Map<string, string>;
+  setHrNotes: (id: string, note: string) => void;
 }
 
-export function EmployeeTable({ analysis, features, nameMap, maxValues }: Props) {
+export function EmployeeTable({ analysis, features, nameMap, maxValues, hrNotes, setHrNotes }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortAsc, setSortAsc] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -111,6 +113,23 @@ export function EmployeeTable({ analysis, features, nameMap, maxValues }: Props)
         </TableBody>
       </Table>
 
+      {/* Risk scale legend */}
+      <div className="flex flex-wrap items-center gap-4 rounded-lg border bg-muted/30 px-4 py-2.5 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Шкала риска выгорания:</span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-6 rounded bg-green-200 dark:bg-green-900/50" />
+          <span><strong className="text-foreground">0–39%</strong> — норма, мониторинг не требуется</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-6 rounded bg-amber-200 dark:bg-amber-900/50" />
+          <span><strong className="text-foreground">40–69%</strong> — повышенное внимание, рекомендована беседа</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-6 rounded bg-red-200 dark:bg-red-900/50" />
+          <span><strong className="text-foreground">70–100%</strong> — критический сигнал, требует действий</span>
+        </span>
+      </div>
+
       {selectedFeatures && selectedResult && (
         <div ref={cardRef} className="scroll-mt-20">
           <EmployeeCard
@@ -119,6 +138,8 @@ export function EmployeeTable({ analysis, features, nameMap, maxValues }: Props)
             result={selectedResult}
             maxValues={maxValues}
             nameMap={nameMap}
+            hrNote={hrNotes.get(selectedResult.employee_id) ?? ""}
+            onHrNoteChange={(note) => setHrNotes(selectedResult.employee_id, note)}
             onClose={() => setSelectedId(null)}
           />
         </div>

@@ -5,6 +5,76 @@ import type { ClaudeAnalysis } from "@/lib/schemas";
 import type { NameMap } from "@/types/index";
 import { resolveNames } from "@/lib/resolveNames";
 
+interface Action {
+  priority: "high" | "medium" | "low";
+  text: string;
+}
+
+function buildActions(analysis: ClaudeAnalysis, nameMap: NameMap): Action[] {
+  const actions: Action[] = [];
+  const rn = (s: string) => resolveNames(s, nameMap);
+
+  const critical = analysis.employees.filter((e) => e.burnout_risk >= 0.7);
+  const elevated = analysis.employees.filter((e) => e.burnout_risk >= 0.4 && e.burnout_risk < 0.7);
+  const overloaded = analysis.employees.filter(
+    (e) => e.overload_category === "критический" || e.overload_category === "высокий"
+  );
+  const hiringSignals = analysis.employees.filter((e) => e.hiring_signal);
+
+  if (critical.length > 0) {
+    const names = critical.map((e) => rn(e.employee_id)).join(", ");
+    actions.push({
+      priority: "high",
+      text: `Провести срочную индивидуальную беседу: ${names}`,
+    });
+  }
+
+  if (overloaded.length > 0) {
+    const names = overloaded.map((e) => rn(e.employee_id)).join(", ");
+    actions.push({
+      priority: "high",
+      text: `Оценить перераспределение нагрузки для: ${names}`,
+    });
+  }
+
+  if (elevated.length > 0) {
+    const names = elevated.map((e) => rn(e.employee_id)).join(", ");
+    actions.push({
+      priority: "medium",
+      text: `Усилить мониторинг состояния сотрудников: ${names}`,
+    });
+  }
+
+  if (hiringSignals.length > 0) {
+    actions.push({
+      priority: "medium",
+      text: `Рассмотреть необходимость найма — признаки кадрового дефицита выявлены у ${hiringSignals.length} ${hiringSignals.length === 1 ? "сотрудника" : "сотрудников"}`,
+    });
+  }
+
+  if (analysis.department.avg_burnout_risk >= 0.4) {
+    actions.push({
+      priority: "low",
+      text: "Провести командный чек-ин для оценки морального климата в отделе",
+    });
+  }
+
+  if (actions.length === 0) {
+    actions.push({
+      priority: "low",
+      text: "Ситуация стабильная — плановый мониторинг согласно регламенту",
+    });
+  }
+
+  return actions;
+}
+
+const ACTION_STYLE: Record<Action["priority"], { dot: string; bg: string; text: string }> = {
+  high:   { dot: "bg-red-500",   bg: "bg-red-50 dark:bg-red-950/30",   text: "text-red-900 dark:text-red-200" },
+  medium: { dot: "bg-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-900 dark:text-amber-200" },
+  low:    { dot: "bg-green-500", bg: "bg-green-50 dark:bg-green-950/30", text: "text-green-900 dark:text-green-200" },
+};
+
 function riskColor(r: number) {
   if (r >= 0.7) return { text: "text-red-600 dark:text-red-400", bg: "bg-red-500/10 dark:bg-red-500/20", label: "Высокий риск 🔴" };
   if (r >= 0.4) return { text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10 dark:bg-amber-500/20", label: "Средний риск 🟡" };
@@ -50,6 +120,7 @@ export function DepartmentSummary({ analysis, nameMap }: Props) {
   const { department, hiring_forecast } = analysis;
   const rc = riskColor(department.avg_burnout_risk);
   const rn = (text: string) => resolveNames(text, nameMap);
+  const actions = buildActions(analysis, nameMap);
 
   return (
     <div className="flex flex-col gap-5">
@@ -108,6 +179,22 @@ export function DepartmentSummary({ analysis, nameMap }: Props) {
               <span className="font-semibold">Прогноз найма: </span>
               {rn(hiring_forecast.justification)}
             </div>
+          </div>
+
+          {/* Recommended actions */}
+          <div className="flex flex-col gap-2 border-t pt-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Рекомендуемые действия
+            </p>
+            {actions.map((action, i) => {
+              const s = ACTION_STYLE[action.priority];
+              return (
+                <div key={i} className={`flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm ${s.bg} ${s.text}`}>
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${s.dot}`} />
+                  <span>{action.text}</span>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

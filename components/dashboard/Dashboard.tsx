@@ -13,6 +13,8 @@ interface Props {
   features: EmployeeFeatures[];
   nameMap: NameMap;
   insights: DepartmentInsights;
+  hrNotes: Map<string, string>;
+  setHrNotes: (id: string, note: string) => void;
   onReset: () => void;
 }
 
@@ -23,7 +25,7 @@ const FEATURE_KEYS: (keyof FeatureValues)[] = [
   "open_tickets_count", "avg_description_length",
 ];
 
-export function Dashboard({ analysis, features, nameMap, insights }: Props) {
+export function Dashboard({ analysis, features, nameMap, insights, hrNotes, setHrNotes }: Props) {
   const maxValues = useMemo(() => {
     const result = {} as Record<keyof FeatureValues, number>;
     for (const key of FEATURE_KEYS) {
@@ -58,6 +60,8 @@ export function Dashboard({ analysis, features, nameMap, insights }: Props) {
           features={features}
           nameMap={nameMap}
           maxValues={maxValues}
+          hrNotes={hrNotes}
+          setHrNotes={setHrNotes}
         />
       </section>
 

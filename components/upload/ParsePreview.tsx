@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { CheckCircle, Users, Calendar, Loader2 } from "lucide-react";
+import { CheckCircle, Users, Calendar, Loader2, AlertTriangle } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Ticket, NameMap } from "@/types/index";
 
@@ -36,7 +37,8 @@ export function ParsePreview({ tickets, nameMap, onReset, onAnalyze, isAnalyzing
       })
       .sort((a, b) => b.count - a.count);
 
-    return { byEmployee, employeeCount: employeeIds.length, minDate, maxDate, total: tickets.length };
+    const periodDays = Math.round((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+    return { byEmployee, employeeCount: employeeIds.length, minDate, maxDate, total: tickets.length, periodDays };
   }, [tickets, nameMap]);
 
   return (
@@ -87,6 +89,17 @@ export function ParsePreview({ tickets, nameMap, onReset, onAnalyze, isAnalyzing
           </CardContent>
         </Card>
       </div>
+
+      {/* Short period warning */}
+      {stats.periodDays < 30 && (
+        <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+          <AlertTriangle className="h-4 w-4 !text-amber-500" />
+          <AlertDescription>
+            <strong>Период данных — {stats.periodDays} {stats.periodDays === 1 ? "день" : stats.periodDays < 5 ? "дня" : "дней"}.</strong>{" "}
+            Для достоверного анализа рекомендуется загружать данные за 60–90 дней. При коротком периоде точность оценок снижается, и ИИ понизит уровень уверенности в результатах.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Employee table */}
       <Card>

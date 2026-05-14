@@ -14,6 +14,12 @@ export interface HistoryItem {
   highRiskCount: number;
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString("ru-RU", {
+    day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
+  });
+}
+
 function riskBadge(r: number) {
   if (r >= 0.7) return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
   if (r >= 0.4) return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
@@ -152,6 +158,7 @@ export function HistoryPanel({ open, onClose, onLoad, onCompare }: Props) {
                       <span className="flex flex-col">
                         <span className="text-sm font-medium text-foreground leading-tight">{item.label}</span>
                         <span className="mt-1 text-xs text-muted-foreground">{item.metadata.period_start} — {item.metadata.period_end}</span>
+                        <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
                         <span className={`mt-1.5 inline-block w-fit rounded px-1.5 py-0.5 text-xs font-semibold ${riskBadge(item.avgBurnoutRisk)}`}>
                           🔥 {Math.round(item.avgBurnoutRisk * 100)}%
                         </span>
@@ -160,7 +167,8 @@ export function HistoryPanel({ open, onClose, onLoad, onCompare }: Props) {
                   ) : (
                     <button className="flex-1 text-left" onClick={() => handleLoad(item.id)} disabled={loadingId === item.id}>
                       <p className="text-sm font-medium text-foreground leading-tight">{item.label}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{item.metadata.period_start} — {item.metadata.period_end}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
+                      <p className="text-xs text-muted-foreground">{item.metadata.period_start} — {item.metadata.period_end}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <span className="text-xs text-muted-foreground">{item.metadata.employee_count} сотр. · {item.metadata.total_tickets} тик.</span>
                         <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${riskBadge(item.avgBurnoutRisk)}`}>
