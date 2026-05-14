@@ -103,7 +103,7 @@ export default function Home() {
           setTimeout(() => setSaveStatus("idle"), 5000);
         });
     } catch (err) {
-      setAnalyzeError(err instanceof Error ? err.message : "Ошибка при обращении к Claude");
+      setAnalyzeError(err instanceof Error ? err.message : "Ошибка при обращении к ИИ");
       setPhase({ name: "preview", tickets, nameMap, features, insights });
     }
   }
@@ -218,7 +218,7 @@ export default function Home() {
               🤖 Предиктивный анализ выгорания и перегрузки на основе данных ITSM
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Загрузите выгрузку → Claude проанализирует риски каждого сотрудника
+              Загрузите выгрузку → ИИ проанализирует риски каждого сотрудника
             </p>
           </div>
         )}
