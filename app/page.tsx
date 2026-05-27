@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Download, History, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Download, History, Loader2, CheckCircle2, AlertCircle, LogOut } from "lucide-react";
 import { FileUploader } from "@/components/upload/FileUploader";
 import { ParsePreview } from "@/components/upload/ParsePreview";
 import { Dashboard } from "@/components/dashboard/Dashboard";
@@ -25,9 +26,16 @@ type Phase =
 
 
 export default function Home() {
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>({ name: "upload" });
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [hrNotes, setHrNotesMap] = useState<Map<string, string>>(new Map());
@@ -205,6 +213,9 @@ export default function Home() {
               </Button>
             )}
             <ThemeToggle />
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Выйти" className="text-muted-foreground hover:text-foreground">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
