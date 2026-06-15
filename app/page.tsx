@@ -8,6 +8,7 @@ import { ParsePreview } from "@/components/upload/ParsePreview";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { CompareView } from "@/components/CompareView";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { HelpModal } from "@/components/HelpModal";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { downloadPdfReport } from "@/components/PdfReport";
 import { engineerFeatures } from "@/lib/features/engineer";
@@ -212,6 +213,7 @@ export default function Home() {
                 {pdfLoading ? "Генерация…" : "Скачать PDF"}
               </Button>
             )}
+            <HelpModal />
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={handleLogout} title="Выйти" className="text-muted-foreground hover:text-foreground">
               <LogOut className="h-4 w-4" />
