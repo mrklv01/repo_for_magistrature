@@ -8,9 +8,39 @@ interface Props {
   data: { week: string; avg_hours: number }[];
 }
 
-function shortWeek(w: string) {
-  const m = w.match(/W(\d+)/);
-  return m ? `Нед ${m[1]}` : w;
+/** "2026-W04"  →  Date of Monday that week (ISO 8601). */
+function isoWeekMonday(w: string): Date | null {
+  const m = w.match(/^(\d{4})-W(\d{2})$/);
+  if (!m) return null;
+  const year = parseInt(m[1], 10);
+  const week = parseInt(m[2], 10);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const monday1 = new Date(jan4.getTime() - (dow - 1) * 86400000);
+  return new Date(monday1.getTime() + (week - 1) * 7 * 86400000);
+}
+
+const RU_MONTHS = ["янв", "фев", "мар", "апр", "май", "июн",
+                   "июл", "авг", "сен", "окт", "ноя", "дек"];
+
+function shortDate(w: string): string {
+  const d = isoWeekMonday(w);
+  if (!d) return w;
+  return `${d.getUTCDate()} ${RU_MONTHS[d.getUTCMonth()]}`;
+}
+
+function weekRange(w: string): string {
+  const mon = isoWeekMonday(w);
+  if (!mon) return w;
+  const sun = new Date(mon.getTime() + 6 * 86400000);
+  const fromDay = mon.getUTCDate();
+  const toDay   = sun.getUTCDate();
+  const month   = RU_MONTHS[sun.getUTCMonth()];
+  const year    = sun.getUTCFullYear();
+  if (mon.getUTCMonth() === sun.getUTCMonth()) {
+    return `${fromDay}–${toDay} ${month} ${year}`;
+  }
+  return `${fromDay} ${RU_MONTHS[mon.getUTCMonth()]} – ${toDay} ${month} ${year}`;
 }
 
 export function TrendChart({ data }: Props) {
@@ -22,7 +52,7 @@ export function TrendChart({ data }: Props) {
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
         <XAxis
           dataKey="week"
-          tickFormatter={shortWeek}
+          tickFormatter={shortDate}
           tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
           tickLine={false}
           interval="preserveStartEnd"
@@ -36,7 +66,7 @@ export function TrendChart({ data }: Props) {
         />
         <Tooltip
           formatter={(v) => [`${Number(v).toFixed(1)} ч`, "Среднее"]}
-          labelFormatter={(w) => shortWeek(String(w))}
+          labelFormatter={(w) => weekRange(String(w))}
           contentStyle={{
             fontSize: 12,
             borderRadius: 6,

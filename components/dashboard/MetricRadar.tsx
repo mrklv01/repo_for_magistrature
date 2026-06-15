@@ -6,17 +6,17 @@ import {
 import type { FeatureValues } from "@/types/index";
 
 const LABELS: Record<keyof FeatureValues, string> = {
-  tickets_per_week:      "Нагрузка",
-  avg_response_min:      "Реакция",
-  avg_execution_hours:   "Исполнение",
-  execution_trend_slope: "Тренд",
-  high_priority_share:   "P1–P2",
-  after_hours_share:     "Вне часов",
-  task_entropy:          "Разнообразие",
-  activity_gaps_count:   "Разрывы",
-  unique_contacts:       "Контакты",
-  open_tickets_count:    "Открытые",
-  avg_description_length:"Сложность",
+  tickets_per_week:       "Нагрузка",
+  avg_response_min:       "Реакция",
+  avg_execution_hours:    "Исполнение",
+  execution_trend_slope:  "Тренд",
+  high_priority_share:    "P1–P2",
+  after_hours_share:      "Вне часов",
+  task_entropy:           "Разнообразие",
+  activity_gaps_count:    "Разрывы",
+  unique_contacts:        "Контакты",
+  open_tickets_count:     "Открытые",
+  avg_description_length: "Сложность",
 };
 
 interface Props {

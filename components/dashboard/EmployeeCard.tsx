@@ -4,12 +4,13 @@ import { X, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MetricRadar } from "@/components/dashboard/MetricRadar";
+import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { TrendChart } from "@/components/dashboard/TrendChart";
 import { VolumeChart } from "@/components/dashboard/VolumeChart";
 import type { ClaudeAnalysis } from "@/lib/schemas";
 import type { EmployeeFeatures, FeatureValues, NameMap } from "@/types/index";
 import { resolveNames } from "@/lib/resolveNames";
+import { fmtIsoDate } from "@/lib/fmtDate";
 
 const OVERLOAD_COLORS: Record<string, string> = {
   низкий: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
@@ -111,7 +112,7 @@ export function EmployeeCard({ name, features, result, maxValues, nameMap, hrNot
               {features.events.map((ev, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
                   <span className="shrink-0 w-4">{EVENT_ICONS[ev.type]}</span>
-                  <span className="text-foreground/70">{ev.date}</span>
+                  <span className="text-foreground/70">{fmtIsoDate(ev.date)}</span>
                   <span>{ev.label}</span>
                 </li>
               ))}
@@ -119,12 +120,16 @@ export function EmployeeCard({ name, features, result, maxValues, nameMap, hrNot
           </div>
         )}
 
+        {/* Metrics */}
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Показатели (90 дней)
+          </p>
+          <MetricsGrid values={features.window_90d} maxValues={maxValues} />
+        </div>
+
         {/* Charts */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div>
-            <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Профиль метрик</p>
-            <MetricRadar values={features.window_90d} maxValues={maxValues} />
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Объём тикетов по неделям</p>
             <VolumeChart data={features.weekly_volume} />

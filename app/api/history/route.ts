@@ -58,10 +58,10 @@ export async function POST(req: NextRequest) {
 
     const createdAt = new Date();
     const label = `${createdAt.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "long",
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
-    })}, ${createdAt.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`;
+    })} ${createdAt.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`;
 
     const record: HistoryRecord = {
       createdAt,

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { X, Trash2, Clock, Loader2, ChevronRight, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { DepartmentStats, HistoryRecord } from "@/types/index";
+import { fmtDateTime, fmtIsoDate } from "@/lib/fmtDate";
 
 export interface HistoryItem {
   id: string;
@@ -15,9 +16,7 @@ export interface HistoryItem {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("ru-RU", {
-    day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-  });
+  return fmtDateTime(iso);
 }
 
 function riskBadge(r: number) {
@@ -157,7 +156,7 @@ export function HistoryPanel({ open, onClose, onLoad, onCompare }: Props) {
                       </span>
                       <span className="flex flex-col">
                         <span className="text-sm font-medium text-foreground leading-tight">{item.label}</span>
-                        <span className="mt-1 text-xs text-muted-foreground">{item.metadata.period_start} — {item.metadata.period_end}</span>
+                        <span className="mt-1 text-xs text-muted-foreground">{fmtIsoDate(item.metadata.period_start)} — {fmtIsoDate(item.metadata.period_end)}</span>
                         <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
                         <span className={`mt-1.5 inline-block w-fit rounded px-1.5 py-0.5 text-xs font-semibold ${riskBadge(item.avgBurnoutRisk)}`}>
                           🔥 {Math.round(item.avgBurnoutRisk * 100)}%
@@ -168,7 +167,7 @@ export function HistoryPanel({ open, onClose, onLoad, onCompare }: Props) {
                     <button className="flex-1 text-left" onClick={() => handleLoad(item.id)} disabled={loadingId === item.id}>
                       <p className="text-sm font-medium text-foreground leading-tight">{item.label}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
-                      <p className="text-xs text-muted-foreground">{item.metadata.period_start} — {item.metadata.period_end}</p>
+                      <p className="text-xs text-muted-foreground">{fmtIsoDate(item.metadata.period_start)} — {fmtIsoDate(item.metadata.period_end)}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <span className="text-xs text-muted-foreground">{item.metadata.employee_count} сотр. · {item.metadata.total_tickets} тик.</span>
                         <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${riskBadge(item.avgBurnoutRisk)}`}>

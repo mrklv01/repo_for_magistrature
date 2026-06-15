@@ -275,7 +275,7 @@ interface ReportProps {
 function ReportDoc({ analysis, features, nameMap, periodStart, periodEnd, hrNotes }: ReportProps) {
   const rn = (t: string) => resolveNames(t, nameMap);
   const { department, hiring_forecast, employees } = analysis;
-  const today = new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+  const today = new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
   const rc = rvColor(department.avg_burnout_risk);
   const sorted = [...employees].sort((a, b) => b.burnout_risk - a.burnout_risk);
 
